@@ -1,20 +1,27 @@
-"""
-ASGI config for core project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/6.0/howto/deployment/asgi/
-"""
-
 import os
-
+import django
 from django.core.asgi import get_asgi_application
-from channels.routing import ProtocolTypeRouter
 
+# 1. Definir la configuración de Django (Debe ser lo PRIMERO)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
+# 2. Inicializar Django manualmente para asegurar que todas las apps (como 'channels') estén listas
+django.setup()
+
+# 3. Crear la aplicación HTTP de Django
+django_asgi_app = get_asgi_application()
+
+# 4. AHORA Y SOLO AHORA, podemos importar los ruteos de nuestra app
+# Esto evita el error de DEFAULT_CHANNEL_LAYER
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+import agents.routing
+
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
-    # "websocket": ... lo añadiremos en un momento
+    "http": django_asgi_app,
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            agents.routing.websocket_urlpatterns
+        )
+    ),
 })
