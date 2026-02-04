@@ -25,13 +25,25 @@ SECRET_KEY = 'django-insecure-n-fc8ecpl=r^4arb2c2chyle*6p9d0#=%8dpzu!qqwv+b@c2k&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_HTTPONLY = False
+SESSION_COOKIE_SAMESITE = 'Lax'
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
+# Only for dev
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
 INSTALLED_APPS = [
     'daphne',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +56,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -103,6 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
